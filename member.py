@@ -1,11 +1,8 @@
 from enum import Enum
 
 
-class Adulto(Enum):
+class Membro(Enum):
     PAI = "Pai"
     MAE = "Mãe"
-
-
-class Membro(Enum):
     FILHO = "Filho"
     BARCO = "Barco"

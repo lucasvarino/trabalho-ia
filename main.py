@@ -1,10 +1,10 @@
 from rule import Rule
 from state import State
-from member import Membro, Adulto
+from member import Membro
 
 
 def main():
-    rule = Rule(Membro.FILHO, Adulto.MAE)
+    rule = Rule(Membro.FILHO, Membro.MAE)
     print(rule.is_valid(State()))
 
 

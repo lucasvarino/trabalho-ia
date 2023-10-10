@@ -1,10 +1,10 @@
 # Classe para representar os estados do problema da travessia da familia do rio
-from member import Membro, Adulto
+from member import Membro
 
 
 class State:
     def __init__(self) -> None:
-        self.left = [Adulto.PAI, Adulto.MAE,
+        self.left = [Membro.PAI, Membro.MAE,
                      Membro.FILHO, Membro.FILHO, Membro.BARCO]
         self.right = [0, 0, 0, 0, 0]
 
@@ -21,4 +21,4 @@ class State:
         return None
 
     def is_complete(self) -> bool:
-        return self.left == [0, 0, 0, 0, 0] & self.right == [Adulto.PAI, Adulto.MAE, Membro.FILHO, Membro.FILHO, Membro.BARCO]
+        return self.left == [0, 0, 0, 0, 0] & self.right == [Membro.PAI, Membro.MAE, Membro.FILHO, Membro.FILHO, Membro.BARCO]
