@@ -4,11 +4,15 @@ from enum import Enum
 
 
 class Rule:
-    boat = []
 
-    def __init__(self, first, second) -> None:
+    def __init__(self, direction, first, second=None) -> None:
+        self.boat = []
+        self.direction = direction
         self.boat.append(first)
-        self.boat.append(second)
+        if second is not None:
+            self.boat.append(second)
+
+        self.boat.append(Membro.BARCO)
 
     def is_valid(self, state: st.State) -> bool:
         # Fazer as verificações das regras
@@ -22,3 +26,15 @@ class Rule:
             return False
 
         return True
+
+    def apply(self, state: st.State):
+        # Tirar os membros do barco do lado que estão
+        for member in self.boat:
+            if self.direction == 0:
+                if member in state.left:
+                    state.left.remove(member)
+                    state.right.append(member)
+            else:
+                if member in state.right:
+                    state.right.remove(member)
+                    state.left.append(member)
