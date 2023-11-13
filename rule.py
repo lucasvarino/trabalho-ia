@@ -5,9 +5,8 @@ from enum import Enum
 
 class Rule:
 
-    def __init__(self, direction, first, second=None) -> None:
-        self.boat = []
-        self.direction = direction
+    def __init__(self, first, second=None) -> None:
+        self.boat = [] 
         self.boat.append(first)
         if second is not None:
             self.boat.append(second)
@@ -28,13 +27,14 @@ class Rule:
         return True
 
     def apply(self, state: st.State):
-        # Tirar os membros do barco do lado que estão
-        for member in self.boat:
-            if self.direction == 0:
-                if member in state.left:
-                    state.left.remove(member)
-                    state.right.append(member)
-            else:
-                if member in state.right:
-                    state.right.remove(member)
-                    state.left.append(member)
+        # Verificar se o barco está do lado direito ou esquerdo
+        if Membro.BARCO in state.left:
+            # Remover os membros do barco do lado esquerdo
+            for membro in self.boat:
+                state.left.remove(membro)
+                state.right.append(membro)
+        else:
+            # Remover os membros do barco do lado direito
+            for membro in self.boat:
+                state.right.remove(membro)
+                state.left.append(membro)
