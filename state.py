@@ -37,9 +37,19 @@ class State:
 
         # Verificar se, do lado que o barco estiver, o número é maior
         if Membro.BARCO in self.left:
-            return boat_num <= state_num_left
+            a = boat_num <= state_num_left
+            b = True
+            for membro in rule.boat:
+                if membro not in self.left:
+                    b = False
+
+            return a and b
         
-        return boat_num <= state_num_right
+        cond2 = True
+        for membro in rule.boat:
+            if membro not in self.right:
+                cond2 = False
+        return boat_num <= state_num_right and cond2
 
     def is_valid(self, rule) -> bool:
         return rule.is_valid(self) and self._is_valid(rule)
@@ -68,25 +78,3 @@ class State:
         membros_ordenados = sorted(membros, key=chave_ordenacao)
 
         return membros_ordenados
-
-
-    def tem_mesmo_numero_membros(self, state):
-    # Verifica se os arrays left e right têm o mesmo número de membros de cada tipo
-        a = self.left.count(Membro.PAI) == state.left.count(Membro.PAI)
-        b = self.left.count(Membro.MAE) == state.left.count(Membro.MAE)
-        c = self.left.count(Membro.FILHO) == state.left.count(Membro.FILHO)
-        d = self.right.count(Membro.PAI) == state.right.count(Membro.PAI)
-        e = self.right.count(Membro.MAE) == state.right.count(Membro.MAE)
-        f = self.right.count(Membro.FILHO) == state.right.count(Membro.FILHO)
-
-        return (
-            a and b and c and d and e and f
-        )
-    
-    def esta_no_historico(self, rule, historico):
-        # Verifica se o objeto está no histórico com base na função tem_mesmo_numero_membros
-        newState = State()
-        newState.left = self.left[:]
-        newState.right = self.right[:]
-        newState = newState.apply_rule(rule)
-        return any(newState.tem_mesmo_numero_membros(state) for state in historico)
