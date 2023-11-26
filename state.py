@@ -18,6 +18,8 @@ class State:
             new_state.left = self.left[:]
             new_state.right = self.right[:]
             rule.apply(new_state)
+            new_state.left = State.ordenar_membros(new_state.left)
+            new_state.right = State.ordenar_membros(new_state.right)
             # Substituir o estado atual pelo novo estado
             return new_state
         return None
@@ -42,17 +44,31 @@ class State:
     def is_valid(self, rule) -> bool:
         return rule.is_valid(self) and self._is_valid(rule)
 
-    def is_in_history(self, rule) -> bool:
+    def is_in_history(self, rule, history) -> bool:
         # Check if the current state is in the history list
         newState = State()
         newState.left = self.left[:]
         newState.right = self.right[:]
-        # newState.apply_rule(rule)
+        newState = newState.apply_rule(rule)
         # print("Historico: ")
         # print(len(self.history))
-        for state in self.history:
+        for state in history:
             if state.left == newState.left and state.right == newState.right:
                 return True
+            
+    def ordenar_membros(membros):
+        # Definir uma função de chave para a ordenação
+        def chave_ordenacao(membro):
+            # Atribuir um valor numérico a cada tipo de membro
+            ordem = {Membro.PAI: 0, Membro.MAE: 1, Membro.FILHO: 2, Membro.BARCO: 3}
+            # Usar o valor atribuído como chave de ordenação
+            return ordem.get(membro, float('inf'))
+
+        # Ordenar a lista de membros usando a chave de ordenação
+        membros_ordenados = sorted(membros, key=chave_ordenacao)
+
+        return membros_ordenados
+
 
     def tem_mesmo_numero_membros(self, state):
     # Verifica se os arrays left e right têm o mesmo número de membros de cada tipo
