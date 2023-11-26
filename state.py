@@ -18,11 +18,7 @@ class State:
             new_state.left = self.left[:]
             new_state.right = self.right[:]
             rule.apply(new_state)
-            self.history.append(self)
-            new_state.history.append(self.history)
             # Substituir o estado atual pelo novo estado
-            self.left = new_state.left[:]
-            self.right = new_state.right[:]
             return new_state
         return None
 
@@ -55,6 +51,26 @@ class State:
         # print("Historico: ")
         # print(len(self.history))
         for state in self.history:
-            print(state)
             if state.left == newState.left and state.right == newState.right:
                 return True
+
+    def tem_mesmo_numero_membros(self, state):
+    # Verifica se os arrays left e right têm o mesmo número de membros de cada tipo
+        a = self.left.count(Membro.PAI) == state.left.count(Membro.PAI)
+        b = self.left.count(Membro.MAE) == state.left.count(Membro.MAE)
+        c = self.left.count(Membro.FILHO) == state.left.count(Membro.FILHO)
+        d = self.right.count(Membro.PAI) == state.right.count(Membro.PAI)
+        e = self.right.count(Membro.MAE) == state.right.count(Membro.MAE)
+        f = self.right.count(Membro.FILHO) == state.right.count(Membro.FILHO)
+
+        return (
+            a and b and c and d and e and f
+        )
+    
+    def esta_no_historico(self, rule, historico):
+        # Verifica se o objeto está no histórico com base na função tem_mesmo_numero_membros
+        newState = State()
+        newState.left = self.left[:]
+        newState.right = self.right[:]
+        newState = newState.apply_rule(rule)
+        return any(newState.tem_mesmo_numero_membros(state) for state in historico)
