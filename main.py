@@ -27,40 +27,39 @@ def backtracking(state: State, i, history=[]):
         return backtracking(state, i+1, history)
 
 def largura():
-    abertos = []
-    state = State()
-    fracasso = False
-    sucesso = False
-    abertos.append(state)
-    print(f'{abertos=}\n')
-    fechados = []
+    abertos = [] # Lista de Estados
+    state = State() # Cria Estado inicial
+    fracasso = False # Variável de Controle em caso de Falha na busca
+    sucesso = False # Variável de Controle em caso de Sucesso na busca
+    abertos.append(state) # Insere o estado inicial na fila de abertos
+    fechados = [] # Lista de estados já visitados
 
-    while(not(fracasso or sucesso)):
-        if len(abertos) == 0:
-            fracasso = True
-            print(f'{fracasso=}\n')
+    while(not (sucesso or fracasso)):
+        print(f'Tamanho do ABERTOS: {len(abertos)}')
+
+        if len(abertos) == 0: # Verifica se a fila de abertos está vazia
+            fracasso = True # Retorna fracasso por não ter mais estados possíveis
+            print('ABERTOS FICOU VAZIO - FRACASSO!')
         else:
-            n = abertos[0]
-            print(f'{n=}\n')
-            abertos.pop(0)
-            if n.is_complete():
+            state = abertos.pop(0)
+            print(f'State atual: {state}')
+            if state.is_complete():
                 sucesso = True
-                print(f'{sucesso=}\n')
+                print('STATE ATUAL É SOLUÇÃO - SUCESSO!')
             else:
                 for rule in rules:
-                    #print('For das regras')
-                    new_state = state.apply_rule(rule)     
-                    if new_state is not None and not state.is_in_history(rule,fechados):
-                        print('Entrou no IF new_state')
+                    new_state = state.apply_rule(rule)
+                    if new_state is not None:
                         abertos.append(new_state)
-                        print(f'{abertos=}\n')
-                fechados.append(n)
-        print(new_state)
-    
-    if sucesso:
-        return n
-    else:
+                        print('ADICIONOU AOS ABERTOS')
+                    else:
+                        print('NÃO ADICIONOU AO ABERTOS')
+                fechados.append(state)
+        print('-' * 20)
+    if fracasso:
         return None
+    else:
+        return state
 
 def main():
     state = State()
@@ -69,7 +68,7 @@ def main():
     # print(state)
     #backtracking(state, 0, history)
     state = largura()
-    state = backtracking(state, 0, history)
+    #state = backtracking(state, 0, history)
 
     # state = state.apply_rule(rules[0])
     # state = state.apply_rule(rules[1])
@@ -81,6 +80,7 @@ def main():
     # state = state.apply_rule(rules[1])
     # state = state.apply_rule(rules[0])
     # print(state.is_complete())
+    print('AQUI')
     print(state)
 
 
