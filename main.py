@@ -27,13 +27,28 @@ def backtracking(state: State, i, history=[]):
         return backtracking(state, i+1, history)
 
 
+def dfs(state: State, history=[]):
+
+    if(state.is_complete()):
+        return state;
+
+    for i in range(len(rules)):
+        if(state.is_valid(rules[i]) and not state.is_in_history(rules[i], history)):
+            newState = state.apply_rule(rules[i])
+            newHistory = history + [newState];
+            result = dfs(newState, newHistory);
+            if result is not None:
+                return result;
+
+    return None;
+
 
 def main():
     state = State()
     history = []
     history.append(state)
     # print(state)
-    state = backtracking(state, 0, history)
+    state = dfs(state, history)
 
     # state = state.apply_rule(rules[0])
     # state = state.apply_rule(rules[1])
