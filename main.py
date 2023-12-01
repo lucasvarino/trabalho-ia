@@ -27,6 +27,10 @@ def backtracking(state: State, i, history=[]):
         return backtracking(state, i+1, history)
 
 
+def heuristic(state: State) -> int:
+    # Exemplo de heurística: número de membros no lado direito do rio
+    return len(state.right)
+
 
 def main():
     state = State()
