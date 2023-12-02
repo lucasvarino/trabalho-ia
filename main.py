@@ -116,6 +116,9 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
                     new_state = state.apply_rule(rule)
                     if new_state is not None:
                         abertos.append(new_state)
+                        # Check if the new state is not None before assigning the previous state
+                        if new_state:
+                            new_state.previous = state
                 fechados.append(state)
        #print('-' * 20)
         it += 1
@@ -125,22 +128,35 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
         return None
     else:
         print(f'Custo Total: {custo_total}')
+        history.pop(0)
+        print(f'Tamanho do histórico: {len(history)}')
+        caminho = []
+        
+        last_state = state
+        while state is not None:
+            caminho.append(state)
+            state = state.previous
 
-        for state in history:
+        print(f'Tamanho do caminho-solução: {len(caminho)}')
+        print('Caminho-solução:') 
+
+        caminho.reverse()
+        for state in caminho:
             print(state)
-            print('-' * 20)
-
-        return state
+            
+        return caminho
 
 def main():
     state = State()
     history = []
     history.append(state)
+    caminho = []
     # print(state)
     #backtracking(state, 0, history)
     #state = largura()
     #state = backtracking(state, 0, history)
-    state = Greedy(state, heuristica)
+    caminho = Greedy(state, heuristica, history)
+#    print('Histórico tamanho: ', len(history))
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ class State:
                      Membro.FILHO, Membro.FILHO, Membro.BARCO]
         self.right = []
         self.history = []
+        self.previous: State = None
 
     def imprime(self) -> None:
         print('Está funcionando')
