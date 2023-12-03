@@ -2,7 +2,7 @@ from rule import Rule
 from state import State
 from member import Membro
 from typing import Callable
-
+from heapq import heappop, heappush
 
 rules = [Rule(Membro.FILHO, Membro.FILHO), Rule(Membro.FILHO), Rule(Membro.PAI), Rule(Membro.MAE)]
 rules[0].name = 'FF'
@@ -145,18 +145,82 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
             print(state)
             
         return caminho
+    
+
+def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+    custo_total = 0
+
+    abertos = []  # Lista de Estados
+    fracasso = False  # Variável de Controle em caso de Falha na busca
+    sucesso = False  # Variável de Controle em caso de Sucesso na busca
+    abertos.append(state)  # Insere o estado inicial na fila de abertos
+    fechados = []  # Lista de estados já visitados
+    it = 0
+
+    while True:
+        if len(abertos) == 0:  # Verifica se a fila de abertos está vazia
+            fracasso = True  # Retorna fracasso por não ter mais estados possíveis
+            print('ABERTOS FICOU VAZIO - FRACASSO!')
+            break
+        else:
+            # Ordena os estados abertos de acordo com a função de avaliação f(n) = g(n) + h(n)
+            abertos.sort(key=lambda state: heuristica(state) + state.cost)
+            state = abertos.pop(0)
+            history.append(state)
+            custo_total += heuristica(state)
+            if state.is_complete():
+                sucesso = True
+                break
+            else:
+                for rule in rules:
+                    new_state = state.apply_rule(rule)
+                    if new_state is not None:
+                        abertos.append(new_state)
+                        if new_state:
+                            new_state.previous = state
+                            new_state.cost = state.cost + 1  # Incrementa o custo g
+                fechados.append(state)
+
+        it += 1
+
+    if fracasso:
+        return None
+    else:
+        print(f'Custo Total: {custo_total}')
+        history.pop(0)
+        print(f'Tamanho do histórico: {len(history)}')
+        caminho = []
+
+        while state is not None:
+            caminho.append(state)
+            state = state.previous
+
+        print(f'Tamanho do caminho-solução: {len(caminho)}')
+        print('Caminho-solução:')
+
+        caminho.reverse()
+        for state in caminho:
+            print(state)
+
+        return caminho
+
 
 def main():
     state = State()
     history = []
     history.append(state)
     caminho = []
+    caminhoAestrela = []
+
     # print(state)
     #backtracking(state, 0, history)
+
     #state = largura()
     #state = backtracking(state, 0, history)
-    caminho = Greedy(state, heuristica, history)
-#    print('Histórico tamanho: ', len(history))
+
+    # caminho = Greedy(state, heuristica, history)
+    caminhoAestrela = Aestrela(state, heuristica, history)
+    # print('Histórico tamanho: ', len(history))
 
 
 if __name__ == "__main__":
