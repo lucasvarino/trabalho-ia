@@ -1,9 +1,14 @@
 from rule import Rule
 from state import State
 from member import Membro
-import heapq
+from typing import Callable
+
 
 rules = [Rule(Membro.FILHO, Membro.FILHO), Rule(Membro.FILHO), Rule(Membro.PAI), Rule(Membro.MAE)]
+rules[0].name = 'FF'
+rules[1].name = 'F'
+rules[2].name = 'P'
+rules[3].name = 'M'
 
 def backtracking(state: State, i, history=[]):
     if state.is_complete():
@@ -27,60 +32,131 @@ def backtracking(state: State, i, history=[]):
     else:
         return backtracking(state, i+1, history)
 
+def largura():
+    abertos = [] # Lista de Estados
+    state = State() # Cria Estado inicial
+    fracasso = False # Variável de Controle em caso de Falha na busca
+    sucesso = False # Variável de Controle em caso de Sucesso na busca
+    abertos.append(state) # Insere o estado inicial na fila de abertos
+    fechados = [] # Lista de estados já visitados
 
-def heuristic(state: State) -> int:
-    # Exemplo de heurística: número de membros no lado direito do rio
-    return len(state.right)
+    while(not (sucesso or fracasso)):
+        print(f'Tamanho do ABERTOS: {len(abertos)}')
 
-def astar_search(initial_state: State):
-    # Utilizando uma fila de prioridade (heapq) para armazenar os estados a serem explorados
-    open_set = [(heuristic(initial_state), initial_state)]
-    # Conjunto de estados já explorados
-    closed_set = set()
+        if len(abertos) == 0: # Verifica se a fila de abertos está vazia
+            fracasso = True # Retorna fracasso por não ter mais estados possíveis
+            print('ABERTOS FICOU VAZIO - FRACASSO!')
+        else:
+            state = abertos.pop(0)
+            print(f'State atual: {state}')
+            if state.is_complete():
+                sucesso = True
+                print('STATE ATUAL É SOLUÇÃO - SUCESSO!')
+            else:
+                for rule in rules:
+                    new_state = state.apply_rule(rule)
+                    if new_state is not None:
+                        abertos.append(new_state)
+                        print('ADICIONOU AOS ABERTOS')
+                    else:
+                        print('NÃO ADICIONOU AO ABERTOS')
+                fechados.append(state)
+        print('-' * 20)
+    if fracasso:
+        return None
+    else:
+        return state
 
-    while open_set:
-        _, current_state = heapq.heappop(open_set)
+def heuristica(state: State) -> int:
+    # Calcula a quantidade de filhos no lado left
+    custo = 0
 
-        if current_state.is_complete():
-            return current_state
+    for membro in state.left:
+        if membro == Membro.FILHO:
+            custo += 1
+        elif membro == Membro.PAI:
+            custo += 2
 
-        closed_set.add(hash(current_state))
+    return custo
 
-        for i, rule in enumerate(rules):
-            if current_state.is_valid(rule):
-                new_state = current_state.apply_rule(rule)
-                if hash(new_state) not in closed_set:
-                    heapq.heappush(open_set, (heuristic(new_state), new_state))
 
-    return None
+def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+    custo_total = 0
 
+    abertos = [] # Lista de Estados
+    fracasso = False # Variável de Controle em caso de Falha na busca
+    sucesso = False # Variável de Controle em caso de Sucesso na busca
+    abertos.append(state) # Insere o estado inicial na fila de abertos
+    fechados = [] # Lista de estados já visitados
+    it = 0
+
+
+    while True:
+        #print(f'Tamanho do ABERTOS: {len(abertos)}')
+        #print(f'Abertos {it}:')
+        #for state in abertos:
+            #print(f'{state}, custo: {heuristica(state)}')
+
+        if len(abertos) == 0: # Verifica se a fila de abertos está vazia
+            fracasso = True # Retorna fracasso por não ter mais estados possíveis
+            print('ABERTOS FICOU VAZIO - FRACASSO!')
+            break
+        else:
+            # Ordena os estados abertos de acordo com o custo da heurística
+            abertos.sort(key=lambda state: heuristica(state))
+            state = abertos.pop(0)
+            #print(f'State atual: {state}, custo: {heuristica(state)}')
+            history.append(state)
+            custo_total += heuristica(state)
+            if state.is_complete():
+                sucesso = True
+                break
+            else:
+                for rule in rules:
+                    new_state = state.apply_rule(rule)
+                    if new_state is not None:
+                        abertos.append(new_state)
+                        # Check if the new state is not None before assigning the previous state
+                        if new_state:
+                            new_state.previous = state
+                fechados.append(state)
+       #print('-' * 20)
+        it += 1
+        #input('Pressione <Enter> para continuar...')
+
+    if fracasso:
+        return None
+    else:
+        print(f'Custo Total: {custo_total}')
+        history.pop(0)
+        print(f'Tamanho do histórico: {len(history)}')
+        caminho = []
+        
+        last_state = state
+        while state is not None:
+            caminho.append(state)
+            state = state.previous
+
+        print(f'Tamanho do caminho-solução: {len(caminho)}')
+        print('Caminho-solução:') 
+
+        caminho.reverse()
+        for state in caminho:
+            print(state)
+            
+        return caminho
 
 def main():
     state = State()
     history = []
     history.append(state)
+    caminho = []
     # print(state)
-    state = backtracking(state, 0, history)
-
-    # state = state.apply_rule(rules[0])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[2])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[0])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[3])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[0])
-    # print(state.is_complete())
-    
-    # Utilizando A* para encontrar a solução
-    solution = astar_search(state)
-
-    if solution:
-        print("Solução encontrada:")
-        print(solution)
-    else:
-        print("Não foi possível encontrar uma solução.")
+    #backtracking(state, 0, history)
+    #state = largura()
+    #state = backtracking(state, 0, history)
+    caminho = Greedy(state, heuristica, history)
+#    print('Histórico tamanho: ', len(history))
 
 
 if __name__ == "__main__":
