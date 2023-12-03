@@ -9,6 +9,7 @@ class State:
         self.right = []
         self.history = []
         self.previous: State = None
+        self.cost = 0  # Adicionando a propriedade para rastrear o custo acumulado
 
     def imprime(self) -> None:
         print('Está funcionando')
@@ -26,6 +27,7 @@ class State:
             new_state.right = State.ordenar_membros(new_state.right)
             new_state.history = self.history[:]
             new_state.history.append(self)
+            new_state.cost = self.cost + 1  # Incrementa o custo g
             if not new_state.is_antecedent():
                 # Substituir o estado atual pelo novo estado
                 return new_state

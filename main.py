@@ -209,6 +209,8 @@ def main():
     state = State()
     history = []
     history.append(state)
+    historyAestrela = []
+    historyAestrela.append(state)
     caminho = []
     caminhoAestrela = []
 
@@ -218,8 +220,10 @@ def main():
     #state = largura()
     #state = backtracking(state, 0, history)
 
-    # caminho = Greedy(state, heuristica, history)
-    caminhoAestrela = Aestrela(state, heuristica, history)
+    caminho = Greedy(state, heuristica, history)
+    print()
+    print()
+    caminhoAestrela = Aestrela(state, heuristica, historyAestrela)
     # print('Histórico tamanho: ', len(history))
 
 
