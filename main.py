@@ -2,7 +2,7 @@ from rule import Rule
 from state import State
 from member import Membro
 from typing import Callable
-
+import time
 
 rules = [Rule(Membro.FILHO, Membro.FILHO), Rule(Membro.FILHO), Rule(Membro.PAI), Rule(Membro.MAE)]
 rules[0].name = 'FF'
@@ -81,6 +81,7 @@ def heuristica(state: State) -> int:
 
 
 def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+    start_time = time.time()  # Registra o tempo inicial
     custo_total = 0
 
     abertos = [] # Lista de Estados
@@ -88,14 +89,9 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
     sucesso = False # Variável de Controle em caso de Sucesso na busca
     abertos.append(state) # Insere o estado inicial na fila de abertos
     fechados = [] # Lista de estados já visitados
-    it = 0
 
 
     while True:
-        #print(f'Tamanho do ABERTOS: {len(abertos)}')
-        #print(f'Abertos {it}:')
-        #for state in abertos:
-            #print(f'{state}, custo: {heuristica(state)}')
 
         if len(abertos) == 0: # Verifica se a fila de abertos está vazia
             fracasso = True # Retorna fracasso por não ter mais estados possíveis
@@ -105,7 +101,6 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
             # Ordena os estados abertos de acordo com o custo da heurística
             abertos.sort(key=lambda state: heuristica(state))
             state = abertos.pop(0)
-            #print(f'State atual: {state}, custo: {heuristica(state)}')
             history.append(state)
             custo_total += heuristica(state)
             if state.is_complete():
@@ -120,30 +115,29 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
                         if new_state:
                             new_state.previous = state
                 fechados.append(state)
-       #print('-' * 20)
-        it += 1
-        #input('Pressione <Enter> para continuar...')
 
     if fracasso:
         return None
     else:
+        end_time = time.time()  # Registra o tempo final
+        execution_time = (end_time - start_time) * 1000  # Calcula o tempo de execução em milissegundos
+        print(f"Tempo de execução: {execution_time:.2f} ms")
+        
         print(f'Custo Total: {custo_total}')
         history.pop(0)
         print(f'Tamanho do histórico: {len(history)}')
         caminho = []
         
-        last_state = state
         while state is not None:
             caminho.append(state)
             state = state.previous
-
+        
         print(f'Tamanho do caminho-solução: {len(caminho)}')
         print('Caminho-solução:') 
 
         caminho.reverse()
         for state in caminho:
             print(state)
-            
         return caminho
 
 def main():
@@ -156,7 +150,6 @@ def main():
     #state = largura()
     #state = backtracking(state, 0, history)
     caminho = Greedy(state, heuristica, history)
-#    print('Histórico tamanho: ', len(history))
 
 
 if __name__ == "__main__":
