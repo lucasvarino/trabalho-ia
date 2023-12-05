@@ -8,6 +8,10 @@ class State:
                      Membro.FILHO, Membro.FILHO, Membro.BARCO]
         self.right = []
         self.history = []
+        self.previous: State = None
+
+    def imprime(self) -> None:
+        print('Está funcionando')
 
     def __str__(self) -> str:
         return f'Left: {self.left}\nRight: {self.right}'
@@ -20,8 +24,11 @@ class State:
             rule.apply(new_state)
             new_state.left = State.ordenar_membros(new_state.left)
             new_state.right = State.ordenar_membros(new_state.right)
-            # Substituir o estado atual pelo novo estado
-            return new_state
+            new_state.history = self.history[:]
+            new_state.history.append(self)
+            if not new_state.is_antecedent():
+                # Substituir o estado atual pelo novo estado
+                return new_state
         return None
 
     def is_complete(self) -> bool:
@@ -53,6 +60,12 @@ class State:
 
     def is_valid(self, rule) -> bool:
         return rule.is_valid(self) and self._is_valid(rule)
+    
+    def is_antecedent(self) -> bool:
+        for state in self.history:
+            if state.left == self.left and state.right == self.right:
+                return True
+        return False
 
     def is_in_history(self, rule, history) -> bool:
         # Check if the current state is in the history list
