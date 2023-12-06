@@ -194,13 +194,25 @@ def ordenada(state: State, heuristica: Callable[[State], int], history=[]) -> St
                         if new_state:
                             new_state.previous = state
                 fechados.append(state)
-            
-            
-
     if (fracasso):
         return None
-
-    return True;
+    else:
+        end_time = time.time()
+        execution_time = (end_time - start_time) * 1000
+        print(f"Tempo de execução: {execution_time:.2f} ms")
+        print(f'Custo Total: {custo}')
+        history.pop(0)
+        print(f'Tamanho do histórico: {len(history)}')
+        caminho = []
+        while state is not None:
+            caminho.append(state)
+            state = state.previous
+        print(f'Tamanho do caminho-solução: {len(caminho)}')
+        print('Caminho-solução:')
+        caminho.reverse()
+        for state in caminho:
+            print(state)
+        return caminho
     
 def main():
     state = State()
@@ -224,7 +236,7 @@ def main():
     #state = largura()
     #state = backtracking(state, 0, history)
     #caminho = Greedy(state, heuristica, history)
-    teste = ordenada(state, heuristica, history)
+    #caminho = ordenada(state, heuristica, history)
 
 if __name__ == "__main__":
     main()
