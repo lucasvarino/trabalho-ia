@@ -3,6 +3,7 @@ from state import State
 from member import Membro
 from typing import Callable
 from heapq import heappop, heappush
+import time
 
 rules = [Rule(Membro.FILHO, Membro.FILHO), Rule(Membro.FILHO), Rule(Membro.PAI), Rule(Membro.MAE)]
 rules[0].name = 'FF'
@@ -81,6 +82,7 @@ def heuristica(state: State) -> int:
 
 
 def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+    start_time = time.time()  # Registra o tempo inicial
     custo_total = 0
 
     abertos = [] # Lista de Estados
@@ -127,6 +129,10 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
     if fracasso:
         return None
     else:
+        end_time = time.time()  # Registra o tempo final
+        execution_time = (end_time - start_time) * 1000  # Calcula o tempo de execução em milissegundos
+        print(f"Tempo de execução: {execution_time:.2f} ms")
+
         print(f'Custo Total: {custo_total}')
         history.pop(0)
         print(f'Tamanho do histórico: {len(history)}')
@@ -148,6 +154,7 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
     
 
 def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+    start_time = time.time()  # Registra o tempo inicial
     custo_total = 0
 
     abertos = []  # Lista de Estados
@@ -186,6 +193,10 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
     if fracasso:
         return None
     else:
+        end_time = time.time()  # Registra o tempo final
+        execution_time = (end_time - start_time) * 1000  # Calcula o tempo de execução em milissegundos
+        print(f"Tempo de execução: {execution_time:.2f} ms")
+
         print(f'Custo Total: {custo_total}')
         history.pop(0)
         print(f'Tamanho do histórico: {len(history)}')
