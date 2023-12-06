@@ -11,6 +11,7 @@ rules[1].name = 'F'
 rules[2].name = 'P'
 rules[3].name = 'M'
 
+
 def backtracking(state: State, i, history=[]):
     if state.is_complete():
         # print(state)
@@ -32,6 +33,7 @@ def backtracking(state: State, i, history=[]):
 
     else:
         return backtracking(state, i+1, history)
+
 
 def dfs(state: State, history=[]):
 
