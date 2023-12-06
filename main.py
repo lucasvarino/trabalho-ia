@@ -2,6 +2,7 @@ from rule import Rule
 from state import State
 from member import Membro
 from typing import Callable
+from heapq import heappop, heappush
 import time
 
 rules = [Rule(Membro.FILHO, Membro.FILHO), Rule(Membro.FILHO), Rule(Membro.PAI), Rule(Membro.MAE)]
@@ -9,6 +10,7 @@ rules[0].name = 'FF'
 rules[1].name = 'F'
 rules[2].name = 'P'
 rules[3].name = 'M'
+
 
 def backtracking(state: State, i, history=[]):
     if state.is_complete():
@@ -31,6 +33,7 @@ def backtracking(state: State, i, history=[]):
 
     else:
         return backtracking(state, i+1, history)
+
 
 def dfs(state: State, history=[]):
 
@@ -80,6 +83,7 @@ def largura():
         return None
     else:
         return state
+
 
 def heuristica(state: State) -> int:
     # Calcula a quantidade de filhos no lado left
@@ -169,6 +173,7 @@ def ordenada(state: State, heuristica: Callable[[State], int], history=[]) -> St
     custo_acumulado = 0
 
     debug = 0
+
     while True:
         if len(abertos) == 0:  # Verifica se a fila de abertos está vazia
             fracasso = True  # Retorna fracasso por não ter mais estados possíveis
@@ -213,30 +218,80 @@ def ordenada(state: State, heuristica: Callable[[State], int], history=[]) -> St
         for state in caminho:
             print(state)
         return caminho
+
+def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+    start_time = time.time()  # Registra o tempo inicial
+    custo_total = 0
+
+    abertos = []  # Lista de Estados
+    fracasso = False  # Variável de Controle em caso de Falha na busca
+    sucesso = False  # Variável de Controle em caso de Sucesso na busca
+    abertos.append(state)  # Insere o estado inicial na fila de abertos
+    fechados = []  # Lista de estados já visitados
+    it = 0
+
+    while True:
+        if len(abertos) == 0:  # Verifica se a fila de abertos está vazia
+            fracasso = True  # Retorna fracasso por não ter mais estados possíveis
+            print('ABERTOS FICOU VAZIO - FRACASSO!')
+            break
+        else:
+            # Ordena os estados abertos de acordo com a função de avaliação f(n) = g(n) + h(n)
+            abertos.sort(key=lambda state: heuristica(state) + state.cost)
+            state = abertos.pop(0)
+            history.append(state)
+            custo_total += heuristica(state)
+            if state.is_complete():
+                sucesso = True
+                break
+            else:
+                for rule in rules:
+                    new_state = state.apply_rule(rule)
+                    if new_state is not None:
+                        abertos.append(new_state)
+                        if new_state:
+                            new_state.previous = state
+                            new_state.cost = state.cost + 1  # Incrementa o custo g
+                fechados.append(state)
+
+        it += 1
+
+    if fracasso:
+        return None
+    else:
+        end_time = time.time()  # Registra o tempo final
+        execution_time = (end_time - start_time) * 1000  # Calcula o tempo de execução em milissegundos
+        print(f"Tempo de execução: {execution_time:.2f} ms")
+
+        print(f'Custo Total: {custo_total}')
+        history.pop(0)
+        print(f'Tamanho do histórico: {len(history)}')
+        caminho = []
+
+        while state is not None:
+            caminho.append(state)
+            state = state.previous
+
+        print(f'Tamanho do caminho-solução: {len(caminho)}')
+        print('Caminho-solução:')
+
+        caminho.reverse()
+        for state in caminho:
+            print(state)
+
+        return caminho
     
 def main():
     state = State()
     history = []
     history.append(state)
     caminho = []
-    # print(state)
-    #state = dfs(state, history)
-    # state = state.apply_rule(rules[0])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[2])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[0])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[3])
-    # state = state.apply_rule(rules[1])
-    # state = state.apply_rule(rules[0])
-    # print(state.is_complete())
-    #print(state);
     #backtracking(state, 0, history)
     #state = largura()
     #state = backtracking(state, 0, history)
     #caminho = Greedy(state, heuristica, history)
     #caminho = ordenada(state, heuristica, history)
+    caminho = Aestrela(state, heuristica, history)
 
 if __name__ == "__main__":
     main()
