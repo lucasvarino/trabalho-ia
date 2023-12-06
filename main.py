@@ -47,7 +47,6 @@ def dfs(state: State, history=[]):
 
     return None;
 
-
 def largura():
     abertos = [] # Lista de Estados
     state = State() # Cria Estado inicial
@@ -93,7 +92,6 @@ def heuristica(state: State) -> int:
             custo += 2
 
     return custo
-
 
 def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> State:
     start_time = time.time()  # Registra o tempo inicial
@@ -155,15 +153,62 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
             print(state)
         return caminho
 
+def pesoTransicao(rule: int) -> int:
+    return rule + 1
+    
+def ordenada(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+    start_time = time.time()  # Registra o tempo inicial
+    custo_total = 0
 
+    abertos = []  # Lista de Estados
+    fracasso = False  # Variável de Controle em caso de Falha na busca
+    sucesso = False  # Variável de Controle em caso de Sucesso na busca
+    abertos.append((state, 0))  # Insere o estado inicial na fila de abertos com custo inicial 0
+    fechados = []  # Lista de estados já visitados
+    transicoesPossiveis = []
+    custo_acumulado = 0
+
+    debug = 0
+    while True:
+        if len(abertos) == 0:  # Verifica se a fila de abertos está vazia
+            fracasso = True  # Retorna fracasso por não ter mais estados possíveis
+            print('ABERTOS FICOU VAZIO - FRACASSO!')
+            break
+
+        else:
+            
+            abertos.sort(key=lambda x:x[1])
+            history.append(state)
+            state, custo = abertos.pop(0)
+            
+            if(state.is_complete()):
+                print("Concluido")
+                break
+
+            else:
+                for i, rule in enumerate(rules):
+                    new_state = state.apply_rule(rule)
+                    if new_state is not None:
+                        abertos.append((new_state, custo + i+1))
+                        
+                        if new_state:
+                            new_state.previous = state
+                fechados.append(state)
+            
+            
+
+    if (fracasso):
+        return None
+
+    return True;
+    
 def main():
     state = State()
     history = []
     history.append(state)
     caminho = []
     # print(state)
-    state = dfs(state, history)
-
+    #state = dfs(state, history)
     # state = state.apply_rule(rules[0])
     # state = state.apply_rule(rules[1])
     # state = state.apply_rule(rules[2])
@@ -174,12 +219,12 @@ def main():
     # state = state.apply_rule(rules[1])
     # state = state.apply_rule(rules[0])
     # print(state.is_complete())
-    print(state);
+    #print(state);
     #backtracking(state, 0, history)
     #state = largura()
     #state = backtracking(state, 0, history)
-    caminho = Greedy(state, heuristica, history)
-
+    #caminho = Greedy(state, heuristica, history)
+    teste = ordenada(state, heuristica, history)
 
 if __name__ == "__main__":
     main()
