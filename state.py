@@ -9,7 +9,7 @@ class State:
         self.right = []
         self.history = []
         self.previous: State = None
-        self.cost = 0  # Adicionando a propriedade para rastrear o custo acumulado
+        self.cost = 0  # Propriedade para rastrear o custo acumulado
 
     def imprime(self) -> None:
         print('Está funcionando')

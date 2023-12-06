@@ -33,6 +33,22 @@ def backtracking(state: State, i, history=[]):
     else:
         return backtracking(state, i+1, history)
 
+def dfs(state: State, history=[]):
+
+    if(state.is_complete()):
+        return state;
+
+    for i in range(len(rules)):
+        if(state.is_valid(rules[i]) and not state.is_in_history(rules[i], history)):
+            newState = state.apply_rule(rules[i])
+            newHistory = history + [newState];
+            result = dfs(newState, newHistory);
+            if result is not None:
+                return result;
+
+    return None;
+
+
 def largura():
     abertos = [] # Lista de Estados
     state = State() # Cria Estado inicial
@@ -40,7 +56,6 @@ def largura():
     sucesso = False # Variável de Controle em caso de Sucesso na busca
     abertos.append(state) # Insere o estado inicial na fila de abertos
     fechados = [] # Lista de estados já visitados
-
     while(not (sucesso or fracasso)):
         print(f'Tamanho do ABERTOS: {len(abertos)}')
 
@@ -68,6 +83,7 @@ def largura():
     else:
         return state
 
+
 def heuristica(state: State) -> int:
     # Calcula a quantidade de filhos no lado left
     custo = 0
@@ -90,14 +106,9 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
     sucesso = False # Variável de Controle em caso de Sucesso na busca
     abertos.append(state) # Insere o estado inicial na fila de abertos
     fechados = [] # Lista de estados já visitados
-    it = 0
 
 
     while True:
-        #print(f'Tamanho do ABERTOS: {len(abertos)}')
-        #print(f'Abertos {it}:')
-        #for state in abertos:
-            #print(f'{state}, custo: {heuristica(state)}')
 
         if len(abertos) == 0: # Verifica se a fila de abertos está vazia
             fracasso = True # Retorna fracasso por não ter mais estados possíveis
@@ -107,7 +118,6 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
             # Ordena os estados abertos de acordo com o custo da heurística
             abertos.sort(key=lambda state: heuristica(state))
             state = abertos.pop(0)
-            #print(f'State atual: {state}, custo: {heuristica(state)}')
             history.append(state)
             custo_total += heuristica(state)
             if state.is_complete():
@@ -122,9 +132,6 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
                         if new_state:
                             new_state.previous = state
                 fechados.append(state)
-       #print('-' * 20)
-        it += 1
-        #input('Pressione <Enter> para continuar...')
 
     if fracasso:
         return None
@@ -132,26 +139,24 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
         end_time = time.time()  # Registra o tempo final
         execution_time = (end_time - start_time) * 1000  # Calcula o tempo de execução em milissegundos
         print(f"Tempo de execução: {execution_time:.2f} ms")
-
+        
         print(f'Custo Total: {custo_total}')
         history.pop(0)
         print(f'Tamanho do histórico: {len(history)}')
         caminho = []
         
-        last_state = state
         while state is not None:
             caminho.append(state)
             state = state.previous
-
+        
         print(f'Tamanho do caminho-solução: {len(caminho)}')
         print('Caminho-solução:') 
 
         caminho.reverse()
         for state in caminho:
             print(state)
-            
         return caminho
-    
+
 
 def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> State:
     start_time = time.time()  # Registra o tempo inicial
@@ -220,18 +225,30 @@ def main():
     state = State()
     history = []
     history.append(state)
+    historyGuloso = []
+    historyGuloso.append(state)
     historyAestrela = []
     historyAestrela.append(state)
-    caminho = []
+    caminhoGuloso = []
     caminhoAestrela = []
 
-    # print(state)
-    #backtracking(state, 0, history)
+    # state = state.apply_rule(rules[0])
+    # state = state.apply_rule(rules[1])
+    # state = state.apply_rule(rules[2])
+    # state = state.apply_rule(rules[1])
+    # state = state.apply_rule(rules[0])
+    # state = state.apply_rule(rules[1])
+    # state = state.apply_rule(rules[3])
+    # state = state.apply_rule(rules[1])
+    # state = state.apply_rule(rules[0])
+    # print(state.is_complete())
+    print(state);
+    # backtracking(state, 0, history)
+    # state = largura()
+    # state = backtracking(state, 0, history)
+    state = dfs(state, history)
 
-    #state = largura()
-    #state = backtracking(state, 0, history)
-
-    caminho = Greedy(state, heuristica, history)
+    caminhoGuloso = Greedy(state, heuristica, historyGuloso)
     print()
     print()
     caminhoAestrela = Aestrela(state, heuristica, historyAestrela)
