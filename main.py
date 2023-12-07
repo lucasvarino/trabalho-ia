@@ -240,7 +240,7 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
             abertos.sort(key=lambda state: heuristica(state) + state.cost)
             state = abertos.pop(0)
             history.append(state)
-            custo_total += heuristica(state)
+            custo_total = state.cost
             if state.is_complete():
                 sucesso = True
                 break
