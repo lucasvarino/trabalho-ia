@@ -58,31 +58,24 @@ def largura():
     abertos.append(state) # Insere o estado inicial na fila de abertos
     fechados = [] # Lista de estados já visitados
     while(not (sucesso or fracasso)):
-        print(f'Tamanho do ABERTOS: {len(abertos)}')
 
         if len(abertos) == 0: # Verifica se a fila de abertos está vazia
             fracasso = True # Retorna fracasso por não ter mais estados possíveis
-            print('ABERTOS FICOU VAZIO - FRACASSO!')
         else:
             state = abertos.pop(0)
-            print(f'State atual: {state}')
             if state.is_complete():
                 sucesso = True
-                print('STATE ATUAL É SOLUÇÃO - SUCESSO!')
             else:
                 for rule in rules:
                     new_state = state.apply_rule(rule)
                     if new_state is not None:
                         abertos.append(new_state)
-                        print('ADICIONOU AOS ABERTOS')
-                    else:
-                        print('NÃO ADICIONOU AO ABERTOS')
                 fechados.append(state)
-        print('-' * 20)
+
     if fracasso:
         return None
     else:
-        return state
+        return state.history
 
 
 def heuristica(state: State) -> int:
@@ -280,11 +273,16 @@ def main():
     history.append(state)
     caminho = []
     #backtracking(state, 0, history)
-    #state = largura()
+    #caminho = largura()
     #state = backtracking(state, 0, history)
     #caminho = Greedy(state, heuristica, history)
     #caminho = ordenada(state, heuristica, history)
-    caminho = Aestrela(state, heuristica, history)
+    #caminho = Aestrela(state, heuristica, history)
+
+    print("CAMINHO:")
+
+    for estado in caminho:
+        print(estado,'\n')
 
 if __name__ == "__main__":
     main()
