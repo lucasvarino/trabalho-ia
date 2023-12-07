@@ -4,6 +4,7 @@ from member import Membro
 from typing import Callable
 from heapq import heappop, heappush
 import time
+import graphviz
 
 rules = [Rule(Membro.FILHO, Membro.FILHO), Rule(Membro.FILHO), Rule(Membro.PAI), Rule(Membro.MAE)]
 rules[0].name = 'FF'
@@ -219,7 +220,7 @@ def ordenada(state: State, heuristica: Callable[[State], int], history=[]) -> St
             print(state)
         return caminho
 
-def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> State:
+def Aestrela(state: State, heuristica: Callable[[State], int], history=[], visualize=True) -> State:
     start_time = time.time()  # Registra o tempo inicial
     custo_total = 0
 
@@ -229,6 +230,9 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
     abertos.append(state)  # Insere o estado inicial na fila de abertos
     fechados = []  # Lista de estados já visitados
     it = 0
+
+    # Inicializa o grafo Graphviz
+    graph = graphviz.Digraph('G', format='png', engine='dot')
 
     while True:
         if len(abertos) == 0:  # Verifica se a fila de abertos está vazia
@@ -240,7 +244,15 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
             abertos.sort(key=lambda state: heuristica(state) + state.cost)
             state = abertos.pop(0)
             history.append(state)
-            custo_total += heuristica(state)
+            custo_total = state.cost
+
+            # Adiciona o estado atual ao grafo
+            graph.node(str(it), label=str(state))
+
+            if it > 0:
+                # Adiciona uma aresta para representar a transição entre estados
+                graph.edge(str(it - 1), str(it))
+
             if state.is_complete():
                 sucesso = True
                 break
@@ -255,6 +267,10 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
                 fechados.append(state)
 
         it += 1
+
+    if visualize:
+        # Salva a representação visual do grafo em um arquivo PNG
+        graph.render('caminho_aestrela', cleanup=True, format='png', engine='dot')
 
     if fracasso:
         return None
@@ -281,6 +297,18 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
 
         return caminho
     
+
+def generate_dot_file(history):
+    dot = graphviz.Digraph(comment='The A* Search Graph')
+
+    for i, state in enumerate(history):
+        dot.node(str(i), label=str(state))
+
+        if i > 0:
+            dot.edge(str(i - 1), str(i))
+
+    dot.render('a_star_search_graph', cleanup=True, format='png', engine='dot')
+
 def main():
     state = State()
     history = []
@@ -292,6 +320,9 @@ def main():
     #caminho = Greedy(state, heuristica, history)
     #caminho = ordenada(state, heuristica, history)
     caminho = Aestrela(state, heuristica, history)
+
+    if caminho:
+        generate_dot_file(history)
 
 if __name__ == "__main__":
     main()
