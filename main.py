@@ -108,12 +108,11 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
     fechados = [] # Lista de estados já visitados
 
 
-    while True:
+    while (sucesso == False and fracasso == False): # Enquanto não for sucesso ou fracasso (ou seja, enquanto a busca não terminar com
 
         if len(abertos) == 0: # Verifica se a fila de abertos está vazia
-            fracasso = True # Retorna fracasso por não ter mais estados possíveis
             print('ABERTOS FICOU VAZIO - FRACASSO!')
-            break
+            fracasso = True # Retorna fracasso por não ter mais estados possíveis
         else:
             # Ordena os estados abertos de acordo com o custo da heurística
             abertos.sort(key=lambda state: heuristica(state))
@@ -122,7 +121,6 @@ def Greedy(state: State, heuristica: Callable[[State], int], history=[]) -> Stat
             custo_total += heuristica(state)
             if state.is_complete():
                 sucesso = True
-                break
             else:
                 for rule in rules:
                     new_state = state.apply_rule(rule)
@@ -174,12 +172,10 @@ def ordenada(state: State, heuristica: Callable[[State], int], history=[]) -> St
 
     debug = 0
 
-    while True:
+    while (sucesso == False and fracasso == False):  # Enquanto não for sucesso ou fracasso (ou seja, enquanto a busca não terminar com
         if len(abertos) == 0:  # Verifica se a fila de abertos está vazia
-            fracasso = True  # Retorna fracasso por não ter mais estados possíveis
             print('ABERTOS FICOU VAZIO - FRACASSO!')
-            break
-
+            fracasso = True  # Retorna fracasso por não ter mais estados possíveis
         else:
             
             abertos.sort(key=lambda x:x[1])
@@ -188,8 +184,7 @@ def ordenada(state: State, heuristica: Callable[[State], int], history=[]) -> St
             
             if(state.is_complete()):
                 print("Concluido")
-                break
-
+                sucesso = True
             else:
                 for i, rule in enumerate(rules):
                     new_state = state.apply_rule(rule)
@@ -230,11 +225,10 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
     fechados = []  # Lista de estados já visitados
     it = 0
 
-    while True:
+    while (sucesso == False and fracasso == False):  # Enquanto não for sucesso ou fracasso (ou seja, enquanto a busca não terminar com
         if len(abertos) == 0:  # Verifica se a fila de abertos está vazia
-            fracasso = True  # Retorna fracasso por não ter mais estados possíveis
             print('ABERTOS FICOU VAZIO - FRACASSO!')
-            break
+            fracasso = True  # Retorna fracasso por não ter mais estados possíveis
         else:
             # Ordena os estados abertos de acordo com a função de avaliação f(n) = g(n) + h(n)
             abertos.sort(key=lambda state: heuristica(state) + state.cost)
@@ -243,7 +237,6 @@ def Aestrela(state: State, heuristica: Callable[[State], int], history=[]) -> St
             custo_total = state.cost
             if state.is_complete():
                 sucesso = True
-                break
             else:
                 for rule in rules:
                     new_state = state.apply_rule(rule)
